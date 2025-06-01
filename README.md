@@ -71,3 +71,55 @@ node server.js
 ```
 
 The server will run on port 3000 by default, or use the PORT environment variable if set (as on Heroku).
+
+## 🚀 Heroku Deployment
+
+1. Create a new Heroku app:
+```bash
+heroku create your-app-name
+```
+
+2. Set the required config variable:
+```bash
+heroku config:set BASE_URL=https://your-app-name.herokuapp.com
+```
+> 💡 **Note**: Replace `your-app-name` with your actual Heroku app name. You can find your app's URL by clicking "Open App" in the Heroku dashboard.
+
+3. Deploy to Heroku:
+```bash
+git push heroku main
+```
+
+4. Add the Heroku Scheduler add-on:
+
+   **Method 1 - Web Dashboard** (recommended for most users):
+   - Go to your app's dashboard on [Heroku](https://dashboard.heroku.com)
+   - Click on your app
+   - Go to the "Resources" tab
+   - In the "Add-ons" section, search for "Heroku Scheduler"
+   - Click "Submit Order Form" to add the scheduler
+
+   **Method 2 - Command Line** (only if you have the local repo connected to Heroku):
+   ```bash
+   heroku addons:create scheduler:standard
+   ```
+
+5. Configure the scheduler in the Heroku dashboard:
+   - Go to Resources → Heroku Scheduler
+   - Click "Add Job"
+   - Set the command to: `curl -X POST $BASE_URL/timestamps/`
+   - Choose your desired frequency (e.g., every 10 minutes)
+
+## 🧪 Local Testing
+
+To test the application locally:
+
+1. Run the development server:
+```bash
+npm run dev
+```
+
+This will start both `server.js` and `worker.js` concurrently. The worker will make a POST request to `/timestamps/` every minute, and the server will write the timestamps to `timestamps.log`. You can make sure the read/write timestamp server is running by visiting http://localhost:3000/ and see if you get the message "Server is running".
+
+To monitor the changes:
+- Keep `timestamps.log` open in your editor to see the new timestamps being added every minute
