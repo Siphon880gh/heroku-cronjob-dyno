@@ -8,7 +8,7 @@
 
 ## 📝 Overview
 
-By Weng Fei Fung (Weng). This sets up a simple API endpoint to test and verify that a scheduled **Heroku dyno** (cron job) is running correctly. Every time the dyno pings the endpoint, the server logs the hit. After 5 successful hits, the job stops—helping confirm that your Heroku Scheduler is working as expected.
+By Weng Fei Fung (Weng). This project sets up a simple API endpoint (POST /timestamps) to verify that a Heroku worker dyno running in the background is functioning correctly. Instead of using Heroku Scheduler, we use a separate worker.js process powered by node-cron to send a request to the server every minute. Each hit is logged by the server. After 5 successful hits, the worker stops. You can view all the timestamps at `timestamps.log` or visit `GET /timestamps` confirming that the cron job and worker dyno are both running as expected.
 
 > ⚠️ **Important Note**: For production use, do not use Heroku's free or eco dynos for critical cron jobs. These dynos will sleep after 30 minutes of inactivity and cannot be woken up by your own scripts. They can only be activated by user visits or external server pings. For reliable cron jobs, use at least a Basic dyno or consider alternative hosting solutions.
 
@@ -99,10 +99,12 @@ git push heroku main
    - In the "Add-ons" section, search for "Heroku Scheduler"
    - Click "Submit Order Form" to add the scheduler
 
+
    **Method 2 - Command Line** (only if you have the local repo connected to Heroku):
    ```bash
    heroku addons:create scheduler:standard
    ```
+
 
 5. Configure the scheduler in the Heroku dashboard:
    - Go to Resources → Heroku Scheduler
@@ -123,3 +125,85 @@ This will start both `server.js` and `worker.js` concurrently. The worker will m
 
 To monitor the changes:
 - Keep `timestamps.log` open in your editor to see the new timestamps being added every minute
+
+1. Create a new Heroku app:
+```bash
+heroku c
+   **Method 1 - Command Line** (only if you have the repo connected to Heroku):
+   ```bash
+   heroku addons:create scheduler:standard
+   ```
+reate your-ap2-name
+```
+   ```
+reate your-ap2-name
+```
+
+2. Configure environment variables:
+```bash
+heroku config:set BASE_URL=https://your-app-name.herokuapp.com
+```
+
+3. Deploy the application:
+```bash
+git push heroku main
+```
+
+### Scheduler Configuration
+
+1. Add the Heroku Scheduler add-on:
+
+   **Meth  **Method 2 - Command Line** (only if you have the local repo connected to Heroku):
+   ```bash
+   heroku addons:create scheduler:standard
+   ```
+
+2. Configure the scheduler in the Heroku dashboard:
+   - Go to Resources → Heroku Scheduler
+   - Click "Add Job"
+   - Set the command to: `curl -X POST $BASE_URL/timestamps/`
+   - Choose your desired frequency (e.g., every 10 minutes)
+
+## 🧪 Local Development
+
+1. Start the development server:
+```bash
+npm run dev
+```
+
+This launches both the server and worker processes. The worker will:
+- Make POST requests to `/timestamps/` every minute
+- Log timestamps to `timestamps.log`
+- Stop after 5 successful executions
+
+2. Monitor execution:
+- Visit `http://localhost:3000/` to verify server status
+- Check `timestamps.log` for execution records
+
+## ⚠️ Important Notes
+
+- Do not use free or eco dynos for critical cron jobs
+- These dynos sleep after 30 minutes of inactivity
+- Consider using at least a Basic dyno for production
+- Alternative hosting solutions may be more suitable for critical tasks
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **Scheduler Not Running**
+   - Verify Heroku Scheduler add-on is installed
+   - Check scheduler configuration
+   - Ensure BASE_URL is set correctly
+
+2. **API Endpoints Not Responding**
+   - Confirm server is running
+   - Check port configuration
+   - Verify environment variables
+
+3. **Worker Not Executing**
+   - Check worker logs
+   - Verify API connectivity
+   - Ensure proper scheduling
+
+For additional help, please open an issue on GitHub.
