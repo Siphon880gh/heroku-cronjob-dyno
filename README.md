@@ -10,6 +10,8 @@
 
 By Weng Fei Fung (Weng). This sets up a simple API endpoint to test and verify that a scheduled **Heroku dyno** (cron job) is running correctly. Every time the dyno pings the endpoint, the server logs the hit. After 5 successful hits, the job stops—helping confirm that your Heroku Scheduler is working as expected.
 
+> ⚠️ **Important Note**: For production use, do not use Heroku's free or eco dynos for critical cron jobs. These dynos will sleep after 30 minutes of inactivity and cannot be woken up by your own scripts. They can only be activated by user visits or external server pings. For reliable cron jobs, use at least a Basic dyno or consider alternative hosting solutions.
+
 ---
 
 ## 🚀 How It Works
